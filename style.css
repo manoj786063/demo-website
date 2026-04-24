@@ -3,6 +3,7 @@ body {
   overflow: hidden;
   background: radial-gradient(circle at center, #000010, #000000);
 }
+
 canvas {
   display: block;
 }
