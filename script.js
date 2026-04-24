@@ -8,7 +8,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.z = 3;
+camera.position.z = 15;
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({
@@ -17,30 +17,55 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-// Cute white object (rounded sphere)
-const geometry = new THREE.SphereGeometry(1, 32, 32);
-const material = new THREE.MeshStandardMaterial({
-  color: 0xffffff,
-  roughness: 0.5,
-  metalness: 0.1
-});
-const sphere = new THREE.Mesh(geometry, material);
-scene.add(sphere);
+// Lights
+const sunLight = new THREE.PointLight(0xffffff, 2, 100);
+scene.add(sunLight);
 
-// Soft lighting
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(2, 2, 5);
-scene.add(light);
-
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
 scene.add(ambientLight);
 
-// Animation loop
+// Sun
+const sunGeometry = new THREE.SphereGeometry(2, 32, 32);
+const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffcc00 });
+const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+scene.add(sun);
+
+// Planet function
+function createPlanet(size, color, distance, speed) {
+  const geometry = new THREE.SphereGeometry(size, 32, 32);
+  const material = new THREE.MeshStandardMaterial({ color });
+  const planet = new THREE.Mesh(geometry, material);
+
+  const pivot = new THREE.Object3D();
+  scene.add(pivot);
+
+  planet.position.x = distance;
+  pivot.add(planet);
+
+  return { planet, pivot, speed };
+}
+
+// Planets
+const planet1 = createPlanet(0.5, 0x3399ff, 5, 0.02);
+const planet2 = createPlanet(0.7, 0xff6633, 8, 0.015);
+const planet3 = createPlanet(1, 0x66ff66, 11, 0.01);
+
+// Animation
 function animate() {
   requestAnimationFrame(animate);
 
-  sphere.rotation.y += 0.01;
-  sphere.rotation.x += 0.005;
+  // Sun rotation
+  sun.rotation.y += 0.005;
+
+  // Planet orbits
+  planet1.pivot.rotation.y += planet1.speed;
+  planet2.pivot.rotation.y += planet2.speed;
+  planet3.pivot.rotation.y += planet3.speed;
+
+  // Planet spin
+  planet1.planet.rotation.y += 0.02;
+  planet2.planet.rotation.y += 0.018;
+  planet3.planet.rotation.y += 0.015;
 
   renderer.render(scene, camera);
 }
